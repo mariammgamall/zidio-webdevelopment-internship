@@ -1,0 +1,222 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: intellmeet-secrets
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+stringData:
+  JWT_SECRET: {{ .Values.secrets.jwtSecret | quote }}
+  JWT_REFRESH_SECRET: {{ .Values.secrets.jwtRefreshSecret | quote }}
+  MONGO_URI: {{ .Values.secrets.mongoUri | quote }}
+  OPENAI_API_KEY: {{ .Values.secrets.openaiApiKey | quote }}
+  GOOGLE_CLIENT_ID: {{ .Values.secrets.googleClientId | quote }}
+  GOOGLE_CLIENT_SECRET: {{ .Values.secrets.googleClientSecret | quote }}
+---
+{{- if .Values.mongodb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:7
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - port: 27017
+{{- end }}
+---
+{{- if .Values.redis.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intellmeet-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: intellmeet-server
+  template:
+    metadata:
+      labels:
+        app: intellmeet-server
+    spec:
+      containers:
+        - name: server
+          image: "{{ .Values.image.server.repository }}:{{ .Values.image.server.tag }}"
+          imagePullPolicy: {{ .Values.image.server.pullPolicy }}
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - secretRef:
+                name: intellmeet-secrets
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.env.nodeEnv | quote }}
+            - name: CLIENT_ORIGIN
+              value: {{ .Values.env.clientOrigin | quote }}
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PORT
+              value: "5000"
+          resources:
+            {{- toYaml .Values.resources.server | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: intellmeet-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: intellmeet-server
+  ports:
+    - port: {{ .Values.service.server.port }}
+      targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intellmeet-client
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: intellmeet-client
+  template:
+    metadata:
+      labels:
+        app: intellmeet-client
+    spec:
+      containers:
+        - name: client
+          image: "{{ .Values.image.client.repository }}:{{ .Values.image.client.tag }}"
+          imagePullPolicy: {{ .Values.image.client.pullPolicy }}
+          ports:
+            - containerPort: 80
+          resources:
+            {{- toYaml .Values.resources.client | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: intellmeet-client
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: intellmeet-client
+  ports:
+    - port: {{ .Values.service.client.port }}
+      targetPort: 80
+---
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: intellmeet-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: intellmeet-server
+                port:
+                  number: {{ .Values.service.server.port }}
+          - path: /socket.io
+            pathType: Prefix
+            backend:
+              service:
+                name: intellmeet-server
+                port:
+                  number: {{ .Values.service.server.port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: intellmeet-client
+                port:
+                  number: {{ .Values.service.client.port }}
+{{- end }}

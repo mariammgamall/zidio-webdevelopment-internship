@@ -1,0 +1,64 @@
+# IntellMeet — Render Blueprint (one-click HTTPS deployment)
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After connecting this repo in Render Dashboard:
+#   1. New > Blueprint > connect GitHub repo
+#   2. Render provisions MongoDB, Redis, API, and static client with HTTPS
+#   3. Live demo URL: https://intellmeet-client.onrender.com
+
+services:
+  - type: web
+    name: intellmeet-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        fromDatabase:
+          name: intellmeet-mongodb
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          name: intellmeet-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: intellmeet-redis
+          type: redis
+          property: port
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        value: https://intellmeet-client.onrender.com
+
+  - type: web
+    name: intellmeet-client
+    runtime: docker
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: ./client
+    plan: free
+    envVars:
+      - key: API_UPSTREAM
+        value: https://intellmeet-api.onrender.com
+      - key: VITE_API_URL
+        value: /api
+      - key: VITE_SOCKET_URL
+        value: /
+
+  - type: redis
+    name: intellmeet-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  - name: intellmeet-mongodb
+    plan: free

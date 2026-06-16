@@ -1,0 +1,63 @@
+replicaCount: 2
+
+image:
+  server:
+    repository: intellmeet/server
+    tag: "2.0.0"
+    pullPolicy: IfNotPresent
+  client:
+    repository: intellmeet/client
+    tag: "2.0.0"
+    pullPolicy: IfNotPresent
+
+service:
+  server:
+    type: ClusterIP
+    port: 5000
+  client:
+    type: ClusterIP
+    port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  host: intellmeet.local
+  tls: false
+
+mongodb:
+  enabled: true
+  storage: 5Gi
+
+redis:
+  enabled: true
+
+resources:
+  server:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+  client:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+
+env:
+  nodeEnv: production
+  clientOrigin: http://intellmeet.local
+
+secrets:
+  jwtSecret: change-me-in-production
+  jwtRefreshSecret: change-me-refresh-in-production
+  mongoUri: mongodb://mongodb:27017/intellmeet
+  openaiApiKey: ""
+  googleClientId: ""
+  googleClientSecret: ""
+
+monitoring:
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
