@@ -15,7 +15,7 @@ IntellMeet transforms hybrid meetings into actionable outcomes: real-time video,
 | # | Deliverable | Location |
 | :---: | :--- | :--- |
 | 1 | **Project Documentation (PDF)** | Submit separately (content summarized in repository / chat) |
-| 2 | **Live Public Demo (HTTPS)** | [https://intellmeet-client.onrender.com](https://intellmeet-client.onrender.com) — deploy via Render (see below) |
+| 2 | **Live Public Demo (HTTPS)** | [https://mariam-intellmeet-app.vercel.app](https://mariam-intellmeet-app.vercel.app) — deploy via Render (see below) |
 | 3 | **GitHub Repository** | [github.com/mariammgamall/zidio-webdevelopment-internship](https://github.com/mariammgamall/zidio-webdevelopment-internship) |
 | 4 | **README** | This file |
 | 5 | **Demo Video** | *Record 3–7 min multi-user session (YouTube unlisted / Loom)* |
@@ -26,7 +26,7 @@ IntellMeet transforms hybrid meetings into actionable outcomes: real-time video,
 
 ## Live Demo
 
-**URL:** [https://intellmeet-client.onrender.com](https://intellmeet-client.onrender.com)
+**URL:** [https://mariam-intellmeet-app.vercel.app](https://mariam-intellmeet-app.vercel.app)
 
 > **Note:** The demo URL is live only after you deploy to Render using the steps in [Deploy on Render](#deploy-on-render-https-live-demo). Free-tier services may take ~30s to wake on first visit.
 
@@ -172,7 +172,7 @@ Copy [`.env.example`](.env.example) and configure `MONGO_URI`, `REDIS_HOST`, and
 
 ## Deploy on Render (HTTPS live demo)
 
-Follow these steps to make **https://intellmeet-client.onrender.com** work.
+Follow these steps to make **https://mariam-intellmeet-app.vercel.app** work.
 
 ### 1. Push code to GitHub
 
@@ -203,7 +203,7 @@ Sign up at [render.com](https://render.com) (free tier is enough for the demo).
 
 | Service | URL |
 | :--- | :--- |
-| **Demo (evaluators)** | https://intellmeet-client.onrender.com |
+| **Demo (evaluators)** | https://mariam-intellmeet-app.vercel.app |
 | API health | https://intellmeet-api.onrender.com/health |
 
 ### 5. Fix CORS (only if login fails)
@@ -211,12 +211,12 @@ Sign up at [render.com](https://render.com) (free tier is enough for the demo).
 If **Try Live Demo** fails with a CORS error:
 
 1. Open **intellmeet-api** → **Environment**
-2. Set `CLIENT_ORIGIN` = `https://intellmeet-client.onrender.com`
+2. Set `CLIENT_ORIGIN` = `https://mariam-intellmeet-app.vercel.app`
 3. Click **Manual Deploy** → **Deploy latest commit**
 
 ### 6. Test the demo
 
-1. Visit https://intellmeet-client.onrender.com (refresh once if cold start is slow)
+1. Visit https://mariam-intellmeet-app.vercel.app (refresh once if cold start is slow)
 2. Click **Try Live Demo**
 3. Create a meeting; join from a second browser/incognito tab
 4. End the meeting and check the AI summary on the dashboard
