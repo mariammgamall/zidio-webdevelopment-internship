@@ -6,7 +6,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const tempDir = path.join(__dirname, '../../../temp_uploads');
+let tempDir = path.join(__dirname, '../../../temp_uploads');
+try {
+  const parentDir = path.dirname(tempDir);
+  fs.accessSync(parentDir, fs.constants.W_OK);
+} catch (err) {
+  tempDir = path.join(process.cwd(), 'temp_uploads');
+}
+
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir, { recursive: true });
 }

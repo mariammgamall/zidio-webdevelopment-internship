@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import * as Sentry from '@sentry/node';
@@ -79,7 +80,13 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 // Serve static profile pictures and recordings
-const uploadsDir = path.join(__dirname, '../../uploads');
+let uploadsDir = path.join(__dirname, '../../uploads');
+try {
+  const parentDir = path.dirname(uploadsDir);
+  fs.accessSync(parentDir, fs.constants.W_OK);
+} catch (err) {
+  uploadsDir = path.join(process.cwd(), 'uploads');
+}
 app.use('/uploads', express.static(uploadsDir));
 
 // 3. Prometheus Metrics Middleware

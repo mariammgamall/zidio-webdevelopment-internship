@@ -37,7 +37,15 @@ const persistFile = async (file, subfolder) => {
     }
   }
 
-  const uploadsDir = path.join(__dirname, `../../../uploads/${subfolder}`);
+  let baseUploadsDir = path.join(__dirname, '../../../uploads');
+  try {
+    const parentDir = path.dirname(baseUploadsDir);
+    fs.accessSync(parentDir, fs.constants.W_OK);
+  } catch (err) {
+    baseUploadsDir = path.join(process.cwd(), 'uploads');
+  }
+
+  const uploadsDir = path.join(baseUploadsDir, subfolder);
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
   const ext = path.extname(file.originalname) || (subfolder === 'recordings' ? '.webm' : '.jpg');
