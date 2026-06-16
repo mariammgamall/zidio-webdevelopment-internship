@@ -2,6 +2,7 @@ import Meeting from '../models/Meeting.js';
 import { getAiQueue } from '../jobs/aiProcessingQueue.js';
 import { uploadRecording } from '../services/storageService.js';
 import logger from '../utils/logger.js';
+import { isRedisConnected } from '../config/redis.js';
 
 // @desc    Create a meeting
 // @route   POST /api/meetings
@@ -132,7 +133,7 @@ export const endMeeting = async (req, res, next) => {
 
     // Queue the AI job
     const aiQueue = getAiQueue();
-    if (aiQueue) {
+    if (aiQueue && isRedisConnected()) {
       await aiQueue.add('processAI', { meetingId: meeting._id }, {
         attempts: 3,
         backoff: {

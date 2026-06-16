@@ -189,6 +189,11 @@ const MeetingRoomPage: React.FC = () => {
       setMeetingTasks((prev) => [...prev, task]);
     });
 
+    socket.on('meeting-ended', () => {
+      alert('This meeting has been ended by the host.');
+      resetMeeting();
+    });
+
     socket.on('user-left', ({ socketId }) => {
       closePeer(socketId);
       removeParticipant(socketId);
@@ -204,6 +209,7 @@ const MeetingRoomPage: React.FC = () => {
       socket.off('stop-typing');
       socket.off('notes-updated');
       socket.off('task-created');
+      socket.off('meeting-ended');
       socket.off('user-left');
       destroyPeerConnections();
     };
@@ -216,7 +222,7 @@ const MeetingRoomPage: React.FC = () => {
     localVideoRef.current.play().catch(() => {});
   }, [localStream, isVideoOff, isScreenSharing]);
 
-  const isHost = user?.id === hostId;
+  const isHost = user?.id === hostId || (user as any)?._id === hostId;
 
   const handleScreenShare = async () => {
     if (!localStream) return;
@@ -329,10 +335,13 @@ const MeetingRoomPage: React.FC = () => {
     } catch { /* proceed */ }
 
     try {
-      await fetch(`${API_URL}/meetings/${activeMeetingId}/end`, {
+      const response = await fetch(`${API_URL}/meetings/${activeMeetingId}/end`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${accessToken}` }
       });
+      if (response.ok) {
+        socket.emit('end-meeting', { roomId });
+      }
     } catch (error) {
       console.error('Failed to end call API', error);
     } finally {

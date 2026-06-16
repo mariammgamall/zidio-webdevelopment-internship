@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { Users, Plus, X, Mail, UserPlus } from 'lucide-react';
+import { getAvatarUrl } from '../utils/url';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -102,7 +103,7 @@ const TeamsPage: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               {selectedTeam.members?.map((m: any) => (
                 <span key={m._id} className="text-xs px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-full flex items-center gap-1.5">
-                  <img src={m.avatar || ''} alt="" className="w-4 h-4 rounded-full" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  <img src={getAvatarUrl(m.avatar)} alt="" className="w-4 h-4 rounded-full object-cover" />
                   {m.name} <span className="text-slate-500">({m.role})</span>
                 </span>
               ))}

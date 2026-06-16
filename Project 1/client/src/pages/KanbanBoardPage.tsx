@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { getSocket } from '../lib/socket';
 import { Plus, X, ListTodo, ClipboardCopy, CheckCircle2, UserPlus, Calendar } from 'lucide-react';
+import { getAvatarUrl } from '../utils/url';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -178,9 +179,9 @@ const KanbanBoardPage: React.FC = () => {
                 <div className="flex items-center gap-1">
                   {task.assignees && task.assignees[0] ? (
                     <img
-                      src={task.assignees[0].avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=64&h=64&q=80'}
+                      src={getAvatarUrl(task.assignees[0].avatar)}
                       alt="assigned"
-                      className="w-5 h-5 rounded-full border border-indigo-500/25"
+                      className="w-5 h-5 rounded-full border border-indigo-500/25 object-cover"
                       title={task.assignees[0].name}
                     />
                   ) : (

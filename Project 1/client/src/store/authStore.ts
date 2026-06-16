@@ -55,7 +55,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         body: JSON.stringify({ email, password })
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        throw new Error(`Server returned invalid response (Status ${response.status}). If using a free-tier Render backend, it may take 1-2 minutes to spin up. Please try again in a moment.`);
+      }
+
       if (!response.ok) {
         throw new Error(data.message || 'Authentication failed');
       }
@@ -86,7 +93,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         body: JSON.stringify({ name, email, password })
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        throw new Error(`Server returned invalid response (Status ${response.status}). If using a free-tier Render backend, it may take 1-2 minutes to spin up. Please try again in a moment.`);
+      }
+
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
       }

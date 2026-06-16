@@ -134,6 +134,13 @@ export const handleSocketConnections = (io) => {
       }
     });
 
+    // End meeting broadcast
+    socket.on('end-meeting', ({ roomId }) => {
+      if (roomId) {
+        socket.to(roomId).emit('meeting-ended');
+      }
+    });
+
     // Real-time Kanban board sync
     socket.on('join-board-room', (teamId) => {
       const room = teamId ? `board_${teamId}` : 'board_global';

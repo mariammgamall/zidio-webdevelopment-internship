@@ -37,7 +37,7 @@ export const seedDatabase = async () => {
       email: 'mariam@intellmeet.app',
       password: 'Mariam@1234',
       role: 'Admin',
-      avatar: 'http://localhost:5000/uploads/mariam_avatar.jpg',
+      avatar: 'https://ui-avatars.com/api/?name=Mariam+Gamal&background=6366f1&color=fff',
       isActive: true
     });
     await demoUser.save();

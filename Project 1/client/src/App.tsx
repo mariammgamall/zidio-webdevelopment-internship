@@ -3,6 +3,7 @@ import { useAuthStore } from './store/authStore';
 import { useNotificationStore } from './store/notificationStore';
 import { useMeetingStore } from './store/meetingStore';
 import { getSocket, connectSocket, disconnectSocket } from './lib/socket';
+import { getAvatarUrl } from './utils/url';
 
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
@@ -14,8 +15,6 @@ import TeamsPage from './pages/TeamsPage';
 import ProfilePage from './pages/ProfilePage';
 
 import { Bell, LogOut, LayoutDashboard, BarChart3, ClipboardList, Users } from 'lucide-react';
-
-const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 const App: React.FC = () => {
   const { user, accessToken, logout } = useAuthStore();
@@ -199,13 +198,7 @@ const App: React.FC = () => {
 
               {/* User Profile avatar */}
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentView('profile')}>
-                {user.avatar ? (
-                  <img src={user.avatar.startsWith('/') ? `${API_BASE}${user.avatar}` : user.avatar} alt={user.name} className="w-8 h-8 rounded-full border border-indigo-500/30" />
-                ) : (
-                  <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
-                    {user.name.charAt(0)}
-                  </div>
-                )}
+                <img src={getAvatarUrl(user.avatar)} alt={user.name} className="w-8 h-8 rounded-full border border-indigo-500/30 object-cover" />
                 <div className="hidden lg:flex flex-col text-left">
                   <span className="text-xs font-semibold text-slate-200">{user.name}</span>
                   <span className="text-[10px] text-slate-400 capitalize">{user.role}</span>

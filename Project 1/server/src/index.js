@@ -133,7 +133,7 @@ const startServer = async () => {
 
   // Run database seeding if Mariam is not in the database or has old avatar
   const mariamUser = await User.findOne({ email: 'mariam@intellmeet.app' });
-  if (!mariamUser || mariamUser.avatar.includes('unsplash')) {
+  if (!mariamUser || mariamUser.avatar.includes('unsplash') || mariamUser.avatar.includes('localhost')) {
     logger.info('Mariam Gamal profile needs update. Seeding database...');
     await seedDatabase();
   }

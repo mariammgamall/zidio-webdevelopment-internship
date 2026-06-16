@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { User, Mail, Shield, Camera, Save } from 'lucide-react';
+import { getAvatarUrl } from '../utils/url';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 const ProfilePage: React.FC = () => {
   const { user, accessToken, setUser } = useAuthStore();
@@ -54,7 +54,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const avatarUrl = user?.avatar?.startsWith('/') ? `${API_BASE}${user.avatar}` : user?.avatar;
+  const avatarUrl = getAvatarUrl(user?.avatar);
 
   return (
     <div className="flex-1 p-6 md:p-8 max-w-2xl mx-auto w-full space-y-6 text-left">
