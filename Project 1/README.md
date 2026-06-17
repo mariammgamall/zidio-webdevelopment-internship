@@ -170,7 +170,7 @@ Copy [`.env.example`](.env.example) and configure `MONGO_URI`, `REDIS_HOST`, and
 
 ---
 
-## Deploy on Render (HTTPS live demo)
+## Deploy on Vercel (HTTPS live demo)
 
 Follow these steps to make **https://mariam-intellmeet-app.vercel.app** work.
 
@@ -183,21 +183,16 @@ git remote add origin https://github.com/mariammgamall/zidio-webdevelopment-inte
 git push -u origin main
 ```
 
-### 2. Create a Render account
+### 2. Create a Vercel account
 
-Sign up at [render.com](https://render.com) (free tier is enough for the demo).
+Sign up at [render.com](https://vercel.com) (free tier is enough for the demo).
 
 ### 3. Deploy with Blueprint
 
-1. Open [Render Dashboard](https://dashboard.render.com)
+1. Open [Vercel Dashboard](https://dashboard.vercel.com)
 2. Click **New** → **Blueprint**
 3. Connect GitHub and select **mariammgamall/zidio-webdevelopment-internship**
-4. Render reads [`render.yaml`](render.yaml) and creates four resources:
-   - `intellmeet-mongodb` — MongoDB database
-   - `intellmeet-redis` — Redis cache
-   - `intellmeet-api` — Express backend (Docker)
-   - `intellmeet-client` — React frontend + Nginx (Docker)
-5. Click **Apply** and wait for all services to show **Live** (~10–15 min on first build)
+4. Click **Apply** and wait for all services to show **Live** (~10–15 min on first build)
 
 ### 4. Verify URLs
 
