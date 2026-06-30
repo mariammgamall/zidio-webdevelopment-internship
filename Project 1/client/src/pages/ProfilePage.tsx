@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { API_URL } from '../lib/api';
-import { User, Mail, Shield, Camera, Save } from 'lucide-react';
+import { User, Mail, Shield, Camera, Save, Trash2, X, Eye } from 'lucide-react';
 import { getAvatarUrl } from '../utils/url';
 
 const ProfilePage: React.FC = () => {
@@ -10,6 +10,7 @@ const ProfilePage: React.FC = () => {
   const [email, setEmail] = useState(user?.email || '');
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +54,26 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleAvatarDelete = async () => {
+    if (!user?.avatar) return;
+    if (!confirm('Are you sure you want to delete your profile photo?')) return;
+    try {
+      const res = await fetch(`${API_URL}/auth/avatar`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.user);
+        setMessage('Avatar deleted successfully');
+      } else {
+        setMessage(data.message || 'Failed to delete avatar');
+      }
+    } catch {
+      setMessage('Failed to delete avatar');
+    }
+  };
+
   const avatarUrl = getAvatarUrl(user?.avatar);
 
   return (
@@ -64,19 +85,35 @@ const ProfilePage: React.FC = () => {
 
       <div className="glass-premium border border-slate-800 rounded-2xl p-6 space-y-6">
         <div className="flex items-center gap-4">
-          <div className="relative">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={user?.name} className="w-20 h-20 rounded-full border-2 border-indigo-500/30 object-cover" />
-            ) : (
-              <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold">{user?.name?.charAt(0)}</div>
-            )}
-            <label className="absolute -bottom-1 -right-1 p-1.5 bg-indigo-600 rounded-full cursor-pointer hover:bg-indigo-500 transition">
-              <Camera size={14} />
+          <div className="relative group cursor-pointer" onClick={() => setIsModalOpen(true)}>
+            <div className="w-20 h-20 rounded-full border-2 border-indigo-500/30 overflow-hidden relative">
+              <img src={avatarUrl} alt={user?.name} className="w-full h-full object-cover" />
+              
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-200 backdrop-blur-[1px]">
+                <Eye size={16} className="text-white" />
+              </div>
+            </div>
+            {/* Small Quick-Upload Camera Indicator */}
+            <label className="absolute -bottom-1 -right-1 p-1.5 bg-indigo-600 rounded-full cursor-pointer hover:bg-indigo-500 transition shadow-lg z-10" onClick={(e) => e.stopPropagation()}>
+              <Camera size={12} />
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </label>
           </div>
           <div>
-            <h3 className="font-bold text-lg">{user?.name}</h3>
+            <h3 className="font-bold text-lg flex items-center gap-2">
+              {user?.name}
+              {user?.avatar && (
+                <button
+                  type="button"
+                  onClick={handleAvatarDelete}
+                  title="Remove Profile Photo"
+                  className="p-1 text-slate-400 hover:text-rose-500 transition rounded-lg hover:bg-slate-800"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </h3>
             <span className="text-xs text-slate-400 flex items-center gap-1"><Shield size={12} /> {user?.role}</span>
           </div>
         </div>
@@ -98,6 +135,55 @@ const ProfilePage: React.FC = () => {
           </button>
         </form>
       </div>
+
+      {/* Lightbox Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 transition-all duration-300">
+          <div className="glass-premium border border-slate-800 rounded-3xl p-6 max-w-sm w-full space-y-6 relative animate-in fade-in zoom-in-95 duration-200">
+            {/* Close Button */}
+            <button 
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition p-1 bg-slate-900 border border-slate-800 rounded-lg"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="text-center space-y-4">
+              <h3 className="font-bold text-lg text-slate-200">Profile Photo</h3>
+              
+              <div className="w-64 h-64 mx-auto rounded-2xl overflow-hidden border-2 border-indigo-500/20 shadow-xl">
+                <img src={avatarUrl} alt={user?.name} className="w-full h-full object-cover" />
+              </div>
+
+              <div className="flex justify-center gap-3 pt-2">
+                <label className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl cursor-pointer transition">
+                  <Camera size={14} />
+                  Change
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    handleAvatarUpload(e);
+                    setIsModalOpen(false);
+                  }} />
+                </label>
+
+                {user?.avatar && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleAvatarDelete();
+                      setIsModalOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-semibold rounded-xl transition"
+                  >
+                    <Trash2 size={14} />
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

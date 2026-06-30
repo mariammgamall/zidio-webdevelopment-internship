@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import User from '../models/User.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwtHelper.js';
 import { uploadAvatar } from '../services/storageService.js';
@@ -238,3 +240,55 @@ export const updateProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Delete user profile avatar
+// @route   DELETE /api/auth/avatar
+// @access  Private
+export const deleteUserAvatar = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.avatar && user.avatar.startsWith('/uploads/')) {
+      const relativePath = user.avatar.replace(/^\/uploads/, '');
+      const pathsToTry = [
+        path.join(process.cwd(), 'uploads', relativePath),
+        path.join(process.cwd(), '../uploads', relativePath)
+      ];
+      
+      for (const p of pathsToTry) {
+        try {
+          if (fs.existsSync(p)) {
+            fs.unlinkSync(p);
+            break;
+          }
+        } catch (err) {
+          logger.error(`Failed to delete avatar from path ${p}`, err);
+        }
+      }
+    }
+
+    user.avatar = '';
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Avatar deleted successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: ''
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

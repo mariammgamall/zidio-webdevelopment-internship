@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
-import { register, login, refresh, getProfile, uploadUserAvatar, logout, updateProfile } from '../controllers/authController.js';
+import { register, login, refresh, getProfile, uploadUserAvatar, deleteUserAvatar, logout, updateProfile } from '../controllers/authController.js';
 import { googleAuth, googleCallback } from '../config/passport.js';
 import { protect, authorize } from '../middleware/auth.js';
 import upload from '../middleware/upload.js';
@@ -63,6 +63,7 @@ router.post('/logout', protect, logout);
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
 router.post('/avatar', protect, upload.single('avatar'), uploadUserAvatar);
+router.delete('/avatar', protect, deleteUserAvatar);
 
 // OAuth2 Google
 router.get('/google', googleAuth);
