@@ -5,7 +5,7 @@ const DEFAULT_AVATAR =
 
 /**
  * Resolves user avatar URLs to work correctly under both local development
- * and deployed environments (Vercel/Render).
+ * and deployed environments (Vercel/Hugging Face).
  */
 export const getAvatarUrl = (avatar: string | undefined | null): string => {
   if (!avatar) {

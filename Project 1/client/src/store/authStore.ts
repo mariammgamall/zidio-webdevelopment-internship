@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       try {
         data = responseText ? JSON.parse(responseText) : {};
       } catch {
-        throw new Error(`Server returned invalid response (Status ${response.status}). If using a free-tier Render backend, it may take 1-2 minutes to spin up. Please try again in a moment.`);
+        throw new Error(`Server returned invalid response (Status ${response.status}). If using a free-tier Hugging Face backend, it may take 1-2 minutes to spin up. Please try again in a moment.`);
       }
 
       if (!response.ok) {
@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       try {
         data = responseText ? JSON.parse(responseText) : {};
       } catch {
-        throw new Error(`Server returned invalid response (Status ${response.status}). If using a free-tier Render backend, it may take 1-2 minutes to spin up. Please try again in a moment.`);
+        throw new Error(`Server returned invalid response (Status ${response.status}). If using a free-tier Hugging Face backend, it may take 1-2 minutes to spin up. Please try again in a moment.`);
       }
 
       if (!response.ok) {

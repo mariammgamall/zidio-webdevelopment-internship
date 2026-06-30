@@ -26,9 +26,9 @@ IntellMeet transforms hybrid meetings into actionable outcomes: real-time video,
 
 ## Live Demo
 
-**URL:** [https://mariam-intellmeet.vercel.app](https://mariam-intellmeet.vercel.app)
+**URL:** [https://mariam-intellmeet.vercel.app/](https://mariam-intellmeet.vercel.app/)
 
-> **Note:** The demo URL is live only after you deploy to Render using the steps in [Deploy on Render](#deploy-on-render-https-live-demo). Free-tier services may take ~30s to wake on first visit.
+> **Note:** The demo URL is live after deploying the backend to Hugging Face Spaces and the frontend to Vercel. Free-tier services may take ~30s to wake on first visit.
 
 No sign-up required for evaluators — use the **"Try Live Demo"** button on the landing page.
 
@@ -130,7 +130,7 @@ Local development: `http://localhost:5173`
 | **Data** | MongoDB, Redis |
 | **Real-Time** | WebRTC (STUN), Socket.io |
 | **AI** | OpenAI GPT-4o-mini, HuggingFace BART, browser Speech API (transcription) |
-| **DevOps** | Docker, Docker Compose, Kubernetes, Helm, GitHub Actions, Render |
+| **DevOps** | Docker, Docker Compose, Kubernetes, Helm, GitHub Actions, Vercel, Hugging Face |
 
 ---
 
@@ -170,9 +170,9 @@ Copy [`.env.example`](.env.example) and configure `MONGO_URI`, `REDIS_HOST`, and
 
 ---
 
-## Deploy on Vercel (HTTPS live demo)
+## Deployment (Vercel & Hugging Face)
 
-Follow these steps to make **https://mariam-intellmeet.vercel.app** work.
+Follow these steps to deploy the application on **Vercel** (frontend client) and **Hugging Face Spaces** (backend API).
 
 ### 1. Push code to GitHub
 
@@ -183,54 +183,56 @@ git remote add origin https://github.com/mariammgamall/zidio-webdevelopment-inte
 git push -u origin main
 ```
 
-### 2. Create a Vercel account
+### 2. Backend Deployment (Hugging Face Spaces)
 
-Sign up at [render.com](https://vercel.com) (free tier is enough for the demo).
+The backend is built as a Docker container, making it ideal for deployment on Hugging Face Spaces using the Docker SDK:
 
-### 3. Deploy with Blueprint
+1. Create a Hugging Face account and go to [Hugging Face Spaces](https://huggingface.co/spaces).
+2. Click **Create new Space**, select **Docker** as the SDK, and choose the **Blank** template.
+3. Push the files inside the `server` directory to the Space's Git repository.
+   *Note: The `Dockerfile` in the `server` directory must be in the root of the Space repository to build successfully.*
+4. In the Hugging Face Space settings, add the following environment variables:
+   - `MONGO_URI` (your MongoDB Database Connection String)
+   - `JWT_SECRET` (secure random string)
+   - `REFRESH_SECRET` (secure random string)
+   - `CLIENT_ORIGIN` = `https://mariam-intellmeet.vercel.app`
+   - `HF_SUMMARY_MODEL` = `facebook/bart-large-cnn` (optional)
+   - `HF_TOKEN` (optional Hugging Face API token)
 
-1. Open [Vercel Dashboard](https://dashboard.vercel.com)
-2. Click **New** → **Blueprint**
-3. Connect GitHub and select **mariammgamall/zidio-webdevelopment-internship**
-4. Click **Apply** and wait for all services to show **Live** (~10–15 min on first build)
+### 3. Frontend Deployment (Vercel)
+
+The frontend client is a static Vite application deployed to Vercel:
+
+1. Configure rewrite rules: Ensure [`client/vercel.json`](file:///d:/Projects/Internships/ZidioDevelopment/Project%201/client/vercel.json) points to your deployed Hugging Face Space URL. Currently, it is set to:
+   `https://mariammgamall-intellmeet-api.hf.space`
+2. Sign up or log in to [Vercel](https://vercel.com).
+3. Click **Add New** → **Project** and import the GitHub repository.
+4. Set the project root directory to `Project 1/client`.
+5. Configure the Build and Development settings:
+   - Framework Preset: **Vite**
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+6. Click **Deploy**.
 
 ### 4. Verify URLs
 
 | Service | URL |
 | :--- | :--- |
-| **Demo (evaluators)** | https://mariam-intellmeet.vercel.app |
-| API health | https://intellmeet-api.onrender.com/health |
+| **Demo (evaluators)** | https://mariam-intellmeet.vercel.app/ |
+| **API Health** | https://mariammgamall-intellmeet-api.hf.space/health |
 
-### 5. Fix CORS (only if login fails)
+### 5. Test the Demo
 
-If **Try Live Demo** fails with a CORS error:
+1. Visit [https://mariam-intellmeet.vercel.app/](https://mariam-intellmeet.vercel.app/) (refresh once if the free-tier backend is cold-starting).
+2. Click **Try Live Demo**.
+3. Create a meeting, join from a second browser/incognito tab to test.
+4. End the meeting and verify the AI summary appears on the dashboard.
 
-1. Open **intellmeet-api** → **Environment**
-2. Set `CLIENT_ORIGIN` = `https://mariam-intellmeet.vercel.app`
-3. Click **Manual Deploy** → **Deploy latest commit**
+### Free Tier Notes & Troubleshooting
 
-### 6. Test the demo
-
-1. Visit https://mariam-intellmeet.vercel.app (refresh once if cold start is slow)
-2. Click **Try Live Demo**
-3. Create a meeting; join from a second browser/incognito tab
-4. End the meeting and check the AI summary on the dashboard
-
-### Free tier notes
-
-- Services sleep after ~15 min of inactivity; first load can take ~30 seconds
-- MongoDB free tier has storage limits — sufficient for evaluation
-- AI summaries use a local fallback when `OPENAI_API_KEY` is not set
-
-### Troubleshooting
-
-| Issue | Fix |
-| :--- | :--- |
-| 404 on demo URL | Blueprint not deployed yet — complete steps above |
-| CORS error on login | Set `CLIENT_ORIGIN` on API (step 5) |
-| WebSocket fails | Redeploy client; nginx proxies `/socket.io/` to the API |
-| Empty AI summary | Expected without OpenAI key — heuristic fallback still runs |
-| Slow first load | Free tier cold start — wait and refresh |
+- **Cold Starts**: Hugging Face Spaces sleep after a period of inactivity. The first request can take 1–2 minutes to spin up the container.
+- **WebSocket Connection**: Socket.io connections are proxied to the Hugging Face Space. If websockets are restricted in the evaluator's network environment, the client will fall back to HTTP long-polling.
+- **CORS Error on Login**: Ensure that `CLIENT_ORIGIN` in the Hugging Face Space settings matches the Vercel URL exactly (`https://mariam-intellmeet.vercel.app`).
 
 ---
 
@@ -282,8 +284,7 @@ intellmeet/
 ├── k8s/                    # Kubernetes manifests
 ├── helm/                   # Helm chart
 ├── .github/workflows/      # CI pipeline
-├── docker-compose.yml
-└── render.yaml             # Render HTTPS deployment blueprint
+└── docker-compose.yml
 ```
 
 ---

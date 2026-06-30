@@ -4,7 +4,7 @@ import { SOCKET_URL } from './api';
 // Hugging Face Spaces do not provide a persistent Socket.IO server.
 // When running against the HF space domain, disable socket usage and
 // provide no-op implementations so the client still works.
-// Note: Production deployment uses Render which supports Socket.IO.
+// Note: Production deployment uses Hugging Face for the backend.
 const IS_HF_SPACE = SOCKET_URL.includes('hf.space') || SOCKET_URL.includes('huggingface.co');
 
 let socket: Socket | null = null;
