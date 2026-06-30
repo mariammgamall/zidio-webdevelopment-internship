@@ -61,7 +61,11 @@ app.use(helmet({
   crossOriginResourcePolicy: false // Allows client to load local uploaded images
 }));
 
-const allowedOrigins = [process.env.CLIENT_ORIGIN || 'http://localhost:5173'];
+const defaultClientOrigin = 'http://localhost:5173,https://mariam-intellmeet.vercel.app';
+const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultClientOrigin)
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (like mobile apps or curl)

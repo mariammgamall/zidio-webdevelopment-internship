@@ -3,9 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { useMeetingStore } from '../store/meetingStore';
 import { Video, Plus, ArrowRight, ClipboardCheck, History, X, Sparkles, MessageSquare, Search, Download, Play } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+import { API_URL, resolveAssetUrl } from '../lib/api';
 
 const DashboardPage: React.FC = () => {
   const { accessToken, user } = useAuthStore();
@@ -83,7 +81,7 @@ const DashboardPage: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const getRecordingUrl = (url: string) => url.startsWith('/') ? `${API_BASE}${url}` : url;
+  const getRecordingUrl = (url: string) => resolveAssetUrl(url);
 
   return (
     <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8 text-left select-none relative">

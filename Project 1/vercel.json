@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://mariammgamall-intellmeet-api.hf.space/api/:path*"
+    },
+    {
+      "source": "/socket.io/:path*",
+      "destination": "https://mariammgamall-intellmeet-api.hf.space/socket.io/:path*"
+    }
+  ]
+}

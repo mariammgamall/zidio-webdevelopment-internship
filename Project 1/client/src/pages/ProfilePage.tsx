@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { API_URL } from '../lib/api';
 import { User, Mail, Shield, Camera, Save } from 'lucide-react';
 import { getAvatarUrl } from '../utils/url';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const ProfilePage: React.FC = () => {
   const { user, accessToken, setUser } = useAuthStore();

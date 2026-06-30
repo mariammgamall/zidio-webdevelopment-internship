@@ -4,7 +4,7 @@
 # After connecting this repo in Render Dashboard:
 #   1. New > Blueprint > connect GitHub repo
 #   2. Render provisions MongoDB, Redis, API, and static client with HTTPS
-#   3. Live demo URL: https://mariam-intellmeet-app.vercel.app
+#   3. Live demo URL: https://mariam-intellmeet.vercel.app
 
 services:
   - type: web
@@ -38,7 +38,7 @@ services:
       - key: JWT_REFRESH_SECRET
         generateValue: true
       - key: CLIENT_ORIGIN
-        value: https://mariam-intellmeet-app.vercel.app
+        value: https://mariam-intellmeet.vercel.app
 
   - type: web
     name: intellmeet-client

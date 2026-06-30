@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
+import { API_URL } from '../lib/api';
 import { Users, Plus, X, Mail, UserPlus } from 'lucide-react';
 import { getAvatarUrl } from '../utils/url';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const TeamsPage: React.FC = () => {
   const { accessToken } = useAuthStore();

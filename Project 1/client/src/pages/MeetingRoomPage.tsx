@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useMeetingStore } from '../store/meetingStore';
 import { useAuthStore } from '../store/authStore';
+import { API_URL } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import {
   getLocalUserMedia,
@@ -16,8 +17,6 @@ import {
   Mic, MicOff, Video, VideoOff, ScreenShare, PhoneOff, Send, MessageSquare,
   Clipboard, Sparkles, Circle, Square, Plus, CheckSquare
 } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const RemoteVideo: React.FC<{ stream: MediaStream | null; name: string }> = ({ stream, name }) => {
   const ref = useRef<HTMLVideoElement>(null);
