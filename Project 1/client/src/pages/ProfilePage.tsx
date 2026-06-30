@@ -74,7 +74,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const avatarUrl = getAvatarUrl(user?.avatar);
+  const avatarUrl = getAvatarUrl(user?.avatar, user?.name);
 
   return (
     <div className="flex-1 p-6 md:p-8 max-w-2xl mx-auto w-full space-y-6 text-left">
@@ -99,20 +99,24 @@ const ProfilePage: React.FC = () => {
               <Camera size={12} />
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </label>
+            {/* Small Quick-Delete Trash Indicator */}
+            {user?.avatar && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAvatarDelete();
+                }}
+                title="Remove Profile Photo"
+                className="absolute -bottom-1 -left-1 p-1.5 bg-rose-600 hover:bg-rose-500 rounded-full cursor-pointer transition shadow-lg z-10 text-white"
+              >
+                <Trash2 size={12} />
+              </button>
+            )}
           </div>
           <div>
             <h3 className="font-bold text-lg flex items-center gap-2">
               {user?.name}
-              {user?.avatar && (
-                <button
-                  type="button"
-                  onClick={handleAvatarDelete}
-                  title="Remove Profile Photo"
-                  className="p-1 text-slate-400 hover:text-rose-500 transition rounded-lg hover:bg-slate-800"
-                >
-                  <Trash2 size={14} />
-                </button>
-              )}
             </h3>
             <span className="text-xs text-slate-400 flex items-center gap-1"><Shield size={12} /> {user?.role}</span>
           </div>

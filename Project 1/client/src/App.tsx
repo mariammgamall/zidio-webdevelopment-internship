@@ -198,7 +198,7 @@ const App: React.FC = () => {
 
               {/* User Profile avatar */}
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentView('profile')}>
-                <img src={getAvatarUrl(user.avatar)} alt={user.name} className="w-8 h-8 rounded-full border border-indigo-500/30 object-cover" />
+                <img src={getAvatarUrl(user.avatar, user.name)} alt={user.name} className="w-8 h-8 rounded-full border border-indigo-500/30 object-cover" />
                 <div className="hidden lg:flex flex-col text-left">
                   <span className="text-xs font-semibold text-slate-200">{user.name}</span>
                   <span className="text-[10px] text-slate-400 capitalize">{user.role}</span>
