@@ -66,10 +66,16 @@ const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultClientOrigin)
   .split(',')
   .map(origin => origin.trim())
   .filter(Boolean);
+
+const isLocalOrigin = (origin) => {
+  if (!origin) return false;
+  return /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origin);
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps or curl)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+    // allow requests with no origin (like mobile apps or curl) or local IPs or development mode
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || isLocalOrigin(origin) || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
       callback(new Error('Blocked by CORS policy'));
@@ -145,7 +151,13 @@ const startServer = async () => {
   // Initialize Socket.io Server
   const io = new Server(server, {
     cors: {
-      origin: allowedOrigins,
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isLocalOrigin(origin) || process.env.NODE_ENV === 'development') {
+          callback(null, true);
+        } else {
+          callback(new Error('Blocked by CORS policy'));
+        }
+      },
       methods: ['GET', 'POST'],
       credentials: true
     }

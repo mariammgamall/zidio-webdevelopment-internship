@@ -139,7 +139,7 @@ const KanbanBoardPage: React.FC = () => {
       <div
         onDragOver={handleDragOver}
         onDrop={(e) => handleDrop(e, statusKey)}
-        className="flex-1 flex flex-col h-[calc(100vh-220px)] bg-slate-900/30 border border-slate-900 rounded-3xl p-4 space-y-4 overflow-hidden relative"
+        className="md:flex-1 flex flex-col h-auto md:h-[calc(100vh-220px)] bg-slate-900/30 border border-slate-900 rounded-3xl p-4 space-y-4 overflow-hidden relative"
       >
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">

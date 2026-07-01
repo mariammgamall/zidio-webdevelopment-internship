@@ -153,7 +153,7 @@ const App: React.FC = () => {
 
                 {/* Notifications Dropdown Panel */}
                 {showNotifications && (
-                  <div className="absolute right-0 mt-3 w-80 glass-premium border border-slate-800 rounded-xl overflow-hidden shadow-2xl z-50">
+                  <div className="fixed md:absolute top-[72px] md:top-auto left-4 md:left-auto right-4 md:right-0 w-auto md:w-80 mt-0 md:mt-3 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden shadow-2xl z-50">
                     <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
                       <span className="font-semibold text-sm">Notifications</span>
                       {unreadCount > 0 && (
@@ -226,7 +226,7 @@ const App: React.FC = () => {
       )}
 
       {/* Main View Router */}
-      <main className="flex-1 flex flex-col">
+      <main className={`flex-1 flex flex-col ${user && !roomId ? 'pb-20 md:pb-0' : ''}`}>
         {roomId ? (
           <MeetingRoomPage />
         ) : (
@@ -241,6 +241,48 @@ const App: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Mobile Navigation Bar */}
+      {user && !roomId && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-900 flex justify-around items-center py-2.5 px-4 shadow-[0_-4px_12px_rgba(0,0,0,0.4)]">
+          <button
+            onClick={() => setCurrentView('dashboard')}
+            className={`flex flex-col items-center gap-1 transition-all duration-200 ${
+              currentView === 'dashboard' ? 'text-indigo-400 font-semibold scale-105' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <LayoutDashboard size={20} />
+            <span className="text-[10px] tracking-wide">Dashboard</span>
+          </button>
+          <button
+            onClick={() => setCurrentView('kanban')}
+            className={`flex flex-col items-center gap-1 transition-all duration-200 ${
+              currentView === 'kanban' ? 'text-indigo-400 font-semibold scale-105' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <ClipboardList size={20} />
+            <span className="text-[10px] tracking-wide">Kanban</span>
+          </button>
+          <button
+            onClick={() => setCurrentView('teams')}
+            className={`flex flex-col items-center gap-1 transition-all duration-200 ${
+              currentView === 'teams' ? 'text-indigo-400 font-semibold scale-105' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Users size={20} />
+            <span className="text-[10px] tracking-wide">Teams</span>
+          </button>
+          <button
+            onClick={() => setCurrentView('analytics')}
+            className={`flex flex-col items-center gap-1 transition-all duration-200 ${
+              currentView === 'analytics' ? 'text-indigo-400 font-semibold scale-105' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <BarChart3 size={20} />
+            <span className="text-[10px] tracking-wide">Analytics</span>
+          </button>
+        </nav>
+      )}
     </div>
   );
 };

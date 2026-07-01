@@ -109,7 +109,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView }) => {
 
       </div>
 
-      <footer className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 font-mono tracking-wider">
+      <footer className="relative md:absolute mt-8 md:mt-0 md:bottom-6 md:left-1/2 md:-translate-x-1/2 text-[10px] text-slate-600 font-mono tracking-wider text-center mx-auto md:mx-0">
         ZIDIO DEVELOPMENT WEB DEVELOPMENT DOMAIN © MARCH 2026
       </footer>
 

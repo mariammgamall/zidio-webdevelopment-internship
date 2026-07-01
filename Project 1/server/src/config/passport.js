@@ -9,7 +9,23 @@ const isGoogleOAuthConfigured =
 
 const DEMO_GOOGLE_EMAIL = 'google.demo@intellmeet.app';
 
-const completeOAuthLogin = (res, user) => {
+const getClientOrigin = (req) => {
+  const referer = req?.headers?.referer;
+  if (referer) {
+    try {
+      const url = new URL(referer);
+      const isLocal = /^(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)$/.test(url.hostname);
+      if (isLocal) {
+        return url.origin;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  return process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+};
+
+const completeOAuthLogin = (req, res, user) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
@@ -20,7 +36,7 @@ const completeOAuthLogin = (res, user) => {
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
-  const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+  const clientOrigin = getClientOrigin(req);
   res.redirect(
     `${clientOrigin}/?oauth=success&token=${accessToken}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&id=${user._id}&role=${user.role}&avatar=${encodeURIComponent(user.avatar || '')}`
   );
@@ -41,9 +57,9 @@ const findOrCreateDemoGoogleUser = async () => {
   return user;
 };
 
-const handleDemoGoogleAuth = async (res) => {
+const handleDemoGoogleAuth = async (req, res) => {
   const user = await findOrCreateDemoGoogleUser();
-  completeOAuthLogin(res, user);
+  completeOAuthLogin(req, res, user);
 };
 
 if (isGoogleOAuthConfigured) {
@@ -81,10 +97,10 @@ if (isGoogleOAuthConfigured) {
 export const googleAuth = async (req, res, next) => {
   if (!isGoogleOAuthConfigured) {
     try {
-      await handleDemoGoogleAuth(res);
+      await handleDemoGoogleAuth(req, res);
     } catch (err) {
       logger.error('Demo Google OAuth failed', err);
-      const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+      const clientOrigin = getClientOrigin(req);
       res.redirect(`${clientOrigin}/?oauth=failed`);
     }
     return;
@@ -94,16 +110,18 @@ export const googleAuth = async (req, res, next) => {
 
 export const googleCallback = (req, res, next) => {
   if (!isGoogleOAuthConfigured) {
-    return handleDemoGoogleAuth(res).catch(() => {
-      res.redirect(`${process.env.CLIENT_ORIGIN || 'http://localhost:5173'}/?oauth=failed`);
+    return handleDemoGoogleAuth(req, res).catch(() => {
+      const clientOrigin = getClientOrigin(req);
+      res.redirect(`${clientOrigin}/?oauth=failed`);
     });
   }
 
   passport.authenticate('google', { session: false }, (err, user) => {
+    const clientOrigin = getClientOrigin(req);
     if (err || !user) {
-      return res.redirect(`${process.env.CLIENT_ORIGIN}/?oauth=failed`);
+      return res.redirect(`${clientOrigin}/?oauth=failed`);
     }
 
-    completeOAuthLogin(res, user);
+    completeOAuthLogin(req, res, user);
   })(req, res, next);
 };
