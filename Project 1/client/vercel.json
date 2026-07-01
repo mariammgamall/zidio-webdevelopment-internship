@@ -7,6 +7,10 @@
     {
       "source": "/socket.io/:path*",
       "destination": "https://mariammgamall-intellmeet-api.hf.space/socket.io/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://mariammgamall-intellmeet-api.hf.space/uploads/:path*"
     }
   ]
 }

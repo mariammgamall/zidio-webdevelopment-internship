@@ -141,10 +141,14 @@ const startServer = async () => {
   // Connect MongoDB
   await connectDB();
 
-  // Run database seeding if Mariam is not in the database or has old avatar
+  // Run database seeding if Mariam is not in the database, has old avatar, or the local avatar file doesn't exist
   const mariamUser = await User.findOne({ email: 'mariam@intellmeet.app' });
-  if (!mariamUser || mariamUser.avatar.includes('unsplash') || mariamUser.avatar.includes('localhost')) {
-    logger.info('Mariam Gamal profile needs update. Seeding database...');
+  const localAvatarExists = mariamUser && mariamUser.avatar.startsWith('/uploads/')
+    ? fs.existsSync(path.join(uploadsDir, mariamUser.avatar.replace(/^\/uploads\//, '')))
+    : true;
+
+  if (!mariamUser || mariamUser.avatar.includes('unsplash') || mariamUser.avatar.includes('localhost') || !localAvatarExists) {
+    logger.info('Mariam Gamal profile needs update or local avatar is missing. Seeding database...');
     await seedDatabase();
   }
 
