@@ -1,14 +1,23 @@
-const DEFAULT_API_URL =
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000/api'
-    : '/api';
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.startsWith('192.168.') ||
+  window.location.hostname.startsWith('10.') ||
+  window.location.hostname.startsWith('172.')
+);
 
-export const API_URL = import.meta.env.VITE_API_URL || DEFAULT_API_URL;
-export const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : '/');
+const DEFAULT_API_URL = isLocalhost ? 'http://localhost:5000/api' : '/api';
+const DEFAULT_SOCKET_URL = isLocalhost ? 'http://localhost:5000' : '/';
+
+// When running in production (deployed), we MUST use relative paths to route through the Vercel rewrite proxy.
+// This avoids CORS preflight credentials issues with Hugging Face Spaces.
+export const API_URL = isLocalhost
+  ? (import.meta.env.VITE_API_URL || DEFAULT_API_URL)
+  : '/api';
+
+export const SOCKET_URL = isLocalhost
+  ? (import.meta.env.VITE_SOCKET_URL || DEFAULT_SOCKET_URL)
+  : '/';
 
 /** Base URL for static assets and full-page OAuth redirects. */
 export function getApiOrigin(): string {
