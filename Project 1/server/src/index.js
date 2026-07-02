@@ -16,6 +16,7 @@ import connectDB from './config/db.js';
 import redisClient, { isRedisConnected } from './config/redis.js';
 import { seedDatabase } from './config/seed.js';
 import User from './models/User.js';
+import Meeting from './models/Meeting.js';
 
 import authRoutes from './routes/authRoutes.js';
 import meetingRoutes from './routes/meetingRoutes.js';
@@ -140,6 +141,18 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   // Connect MongoDB
   await connectDB();
+
+  // Cleanup specific test meetings requested by user
+  try {
+    const deleteResult = await Meeting.deleteMany({
+      title: { $in: ["mariam's testing process", "test", "mariam's testing process / test"] }
+    });
+    if (deleteResult.deletedCount > 0) {
+      logger.info(`Cleaned up test meetings on startup. Deleted count: ${deleteResult.deletedCount}`);
+    }
+  } catch (cleanupErr) {
+    logger.error('Failed to cleanup test meetings on startup:', cleanupErr);
+  }
 
   // Run database seeding if Mariam is not in the database, has old avatar, or the local avatar file doesn't exist
   const mariamUser = await User.findOne({ email: 'mariam@intellmeet.app' });

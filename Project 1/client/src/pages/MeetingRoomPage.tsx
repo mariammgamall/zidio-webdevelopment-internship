@@ -224,6 +224,10 @@ const MeetingRoomPage: React.FC = () => {
   const isHost = user?.id === hostId || (user as any)?._id === hostId;
 
   const handleScreenShare = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+      alert("Screen sharing is not supported on this device or browser.");
+      return;
+    }
     if (!localStream) return;
     try {
       if (isScreenSharing) {
@@ -411,7 +415,7 @@ const MeetingRoomPage: React.FC = () => {
           <button onClick={toggleVideo} className={`p-3.5 rounded-xl transition ${isVideoOff ? 'bg-rose-500/20 text-rose-400 border border-rose-500/45' : 'bg-slate-800 text-slate-300 border border-slate-700'}`}>
             {isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
           </button>
-          <button onClick={handleScreenShare} className={`p-3.5 rounded-xl transition ${isScreenSharing ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/45' : 'bg-slate-800 text-slate-300 border border-slate-700'}`}>
+          <button onClick={handleScreenShare} className={`hidden md:block p-3.5 rounded-xl transition ${isScreenSharing ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/45' : 'bg-slate-800 text-slate-300 border border-slate-700'}`}>
             <ScreenShare size={20} />
           </button>
           <button onClick={handleToggleRecording} className={`p-3.5 rounded-xl transition ${isRecording ? 'bg-rose-600 text-white border border-rose-500' : 'bg-slate-800 text-slate-300 border border-slate-700'}`} title="Record meeting">
