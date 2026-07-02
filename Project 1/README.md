@@ -18,7 +18,7 @@ IntellMeet transforms hybrid meetings into actionable outcomes: real-time video,
 | 2 | **Live Public Demo (HTTPS)** | [https://mariam-intellmeet.vercel.app](https://mariam-intellmeet.vercel.app) — deploy via vercel (see below) |
 | 3 | **GitHub Repository** | [github.com/mariammgamall/zidio-webdevelopment-internship](https://github.com/mariammgamall/zidio-webdevelopment-internship) |
 | 4 | **README** | This file |
-| 5 | **Demo Video** | https://drive.google.com/file/d/12t9p4eS0twAdkDG07JhXX69pMtHM26az/view?usp=drive_link |
+| 5 | **Demo Video** | https://drive.google.com/file/d/1ULbXRZ7A2b6IxPaJI56QA5UG-46xOIjg/view?usp=sharing |
 
 **Author:** Mariam Gamal Elsayed · ID: ZIDIOXEM8tD · June 2026
 
